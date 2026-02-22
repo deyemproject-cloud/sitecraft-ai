@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteCraft AI - Crea siti web con l'AI</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --bg: #0f0f23;
+            --surface: #1a1a2e;
+            --surface-light: #252542;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        #root { min-height: 100vh; }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        const useAuth = () => {
+            const [user, setUser] = useState(() => {
+                const saved = localStorage.getItem('sitecraft_user');
+                return saved ? JSON.parse(saved) : null;
+            });
+            const login = (email) => {
+                const mockUser = { email, name: email.split('@')[0], plan: 'pro' };
+                localStorage.setItem('sitecraft_user', JSON.stringify(mockUser));
+                setUser(mockUser);
+            };
+            const logout = () => {
+                localStorage.removeItem('sitecraft_user');
+                setUser(null);
+            };
+            return { user, login, logout };
+        };
+
+        const Landing = ({ onStart }) => (
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+                <nav style={{ padding: '1.5rem 3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className="font-display" style={{ fontSize: '1.5rem', fontWeight: 700 }} className="gradient-text">SiteCraft</div>
+                    <button onClick={onStart} style={{ padding: '0.75rem 1.5rem', background: 'var(--primary)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer' }}>
+                        Inizia Ora
+                    </button>
+                </nav>
+                
+                <section style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', position: 'relative' }}>
+                    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} style={{ textAlign: 'center', maxWidth: '800px', zIndex: 10 }}>
+                        <h1 className="font-display" style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)', marginBottom: '1.5rem' }}>
+                            Crea siti web con <span className="gradient-text">l'AI</span>
+                        </h1>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1.25rem', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+                            Descrivi il sito dei tuoi sogni. L'intelligenza artificiale lo costruisce in secondi.
+                        </p>
+                        <motion.button 
+                            onClick={onStart}
+                            whileHover={{ scale: 1.05 }} 
+                            whileTap={{ scale: 0.95 }}
+                            style={{ padding: '1rem 2.5rem', fontSize: '1.1rem', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}
+                        >
+                            Prova Gratuitamente →
+                        </motion.button>
+                    </motion.div>
+                </section>
+            </div>
+        );
+
+        const Dashboard = ({ user, onLogout }) => {
+            const [prompt, setPrompt] = useState('');
+            const [loading, setLoading] = useState(false);
+            const [result, setResult] = useState(null);
+
+            const generate = () => {
+                if (!prompt) return;
+                setLoading(true);
+                setTimeout(() => {
+                    setLoading(false);
+                    setResult({ name: 'Sito Generato', url: 'miosito.sitecraft.app' });
+                }, 2500);
+            };
+
+            return (
+                <div style={{ minHeight: '100vh', display: 'flex' }}>
+                    <aside style={{ width: '260px', background: 'var(--surface)', padding: '2rem', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div className="font-display gradient-text" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '3rem' }}>SiteCraft</div>
+                        <nav>
+                            {['✨ Crea Sito', '🌐 I Miei Siti', '🎨 Template', '⚙️ Impostazioni'].map((item, i) => (
+                                <div key={i} style={{ padding: '1rem', borderRadius: '8px', background: i === 0 ? 'rgba(99,102,241,0.2)' : 'transparent', color: i === 0 ? 'white' : 'var(--text-muted)', marginBottom: '0.5rem', cursor: 'pointer' }}>{item}</div>
+                            ))}
+                        </nav>
+                        <div style={{ marginTop: 'auto', paddingTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                <div style={{ width: '40px', height: '40px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{user.name[0].toUpperCase()}</div>
+                                <div>
+                                    <div style={{ fontWeight: 500 }}>{user.name}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Pro Plan</div>
+                                </div>
+                            </div>
+                            <button onClick={onLogout} style={{ width: '100%', padding: '0.75rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'var(--text-muted)', cursor: 'pointer' }}>Logout</button>
+                        </div>
+                    </aside>
+
+                    <main style={{ flex: 1, padding: '3rem' }}>
+                        <h1 className="font-display" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Crea il tuo sito</h1>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Descrivi cosa vuoi e lascia che l'AI faccia il resto</p>
+
+                        <div className="glass" style={{ padding: '2rem', borderRadius: '16px', marginBottom: '2rem' }}>
+                            <textarea 
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
+                                placeholder="Es: Un sito per una gelateria artigianale con stile vintage e colori pastello..."
+                                style={{ width: '100%', minHeight: '120px', padding: '1rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', fontSize: '1rem', marginBottom: '1.5rem', resize: 'vertical' }}
+                            />
+                            <motion.button 
+                                onClick={generate}
+                                disabled={!prompt || loading}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                style={{ padding: '1rem 2rem', background: loading ? 'rgba(99,102,241,0.5)' : 'linear-gradient(135deg, var(--primary), var(--secondary))', border: 'none', borderRadius: '10px', color: 'white', fontWeight: 600, cursor: !prompt || loading ? 'not-allowed' : 'pointer', opacity: !prompt || loading ? 0.7 : 1 }}
+                            >
+                                {loading ? '⚡ Generazione in corso...' : '✨ Genera Sito'}
+                            </motion.button>
+                        </div>
+
+                        {result && (
+                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass" style={{ padding: '2rem', borderRadius: '16px', border: '1px solid rgba(99,102,241,0.3)' }}>
+                                <h3 style={{ marginBottom: '1rem' }}>✅ Sito generato!</h3>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{result.url}</p>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <button style={{ padding: '0.75rem 1.5rem', background: 'var(--primary)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer' }}>🚀 Pubblica</button>
+                                    <button style={{ padding: '0.75rem 1.5rem', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px', color: 'white', cursor: 'pointer' }}>👁️ Preview</button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const Login = ({ onLogin, onBack }) => {
+            const [email, setEmail] = useState('');
+            return (
+                <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass" style={{ padding: '3rem', borderRadius: '20px', width: '100%', maxWidth: '400px' }}>
+                        <button onClick={onBack} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', marginBottom: '1.5rem' }}>← Indietro</button>
+                        <h1 className="font-display" style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Bentornato</h1>
+                        <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Accedi per creare siti</p>
+                        <input 
+                            type="email" 
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="tu@email.com"
+                            style={{ width: '100%', padding: '1rem', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', color: 'white', fontSize: '1rem', marginBottom: '1.5rem' }}
+                        />
+                        <motion.button 
+                            onClick={() => onLogin(email || 'user@example.com')}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            style={{ width: '100%', padding: '1rem', background: 'linear-gradient(135deg, var(--primary), var(--secondary))', border: 'none', borderRadius: '10px', color: 'white', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                            Accedi
+                        </motion.button>
+                    </motion.div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const { user, login, logout } = useAuth();
+            const [view, setView] = useState('landing');
+
+            if (user) return <Dashboard user={user} onLogout={logout} />;
+            if (view === 'login') return <Login onLogin={login} onBack={() => setView('landing')} />;
+            return <Landing onStart={() => setView('login')} />;
+        };
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
