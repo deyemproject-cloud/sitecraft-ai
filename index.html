@@ -64,7 +64,10 @@
         const { useState, useEffect, useRef } = React;
         const { motion, AnimatePresence } = window.Motion;
 
-        const API_URL = 'http://localhost:3333/api';
+        // Rileva se in produzione (Render) o sviluppo locale
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3333/api' 
+            : 'https://sitecraft-ai.onrender.com/api';
 
         // API Functions
         const api = {

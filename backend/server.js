@@ -7,14 +7,19 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
 const app = express();
-const PORT = 3333;
+const PORT = process.env.PORT || 3333;
 
 // Initialize OpenAI
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.use(cors());
+// CORS per permettere frontend su GitHub Pages/domini diversi
+app.use(cors({
+  origin: '*', // In produzione limita al tuo dominio frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Store generated sites (in production use a database)

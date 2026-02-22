@@ -1,0 +1,34 @@
+# Render Blueprint per SiteCraft AI
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: sitecraft-ai
+    runtime: node
+    plan: free
+    repo: https://github.com/deyemproject-cloud/sitecraft-ai
+    branch: main
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: OPENAI_API_KEY
+        sync: false  # Da impostare manualmente in dashboard
+    autoDeploy: true
+
+  # Frontend statico (opzionale - puoi usare anche GitHub Pages)
+  - type: static
+    name: sitecraft-ai-frontend
+    plan: free
+    repo: https://github.com/deyemproject-cloud/sitecraft-ai
+    branch: main
+    buildCommand: echo "No build needed"
+    staticPublishPath: ./
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://sitecraft-ai.onrender.com/api/$1
